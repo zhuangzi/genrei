@@ -9,26 +9,48 @@ import System.Process
 import Text.JSON
 import Text.JSON.Helpers
 import Text.Printf
+import System.IO
+
+type Camxes = (Handle,Handle,Handle,ProcessHandle)
+data State = State { stateCamxes :: Camxes }
 
 main = do
+  camxes <- getCamxes ["-f"]
   runFastCGIConcurrent 20 . handleErrors $ do
     method <- fromMaybe "commands" <$> getInput "method"
     setHeader "Content-Type" "text/plain"
     case lookup method commands of
-      Just runCmd -> runCmd
+      Just runCmd -> runCmd $ State camxes
       Nothing     -> failure "Unknown page."
+
+getCamxes opts = do
+  camxes@(inp,out,err,_) <- runInteractiveCommand $ "camxes " ++ unwords opts
+  mapM_ (`hSetBinaryMode` False) [inp,out,err]
+  mapM_ (const $ hGetLine out) opts
+  return camxes
 
 failure = outObj "failure"
 success = outObj "success"
 outObj x v = output . encode $ makeObj [(x,showJSON v)]
 
-commands = [listCommands,jbofiheGrammar]
+commands = [listCommands,camxesGrammar,jbofiheGrammar]
 cmd = (,)
 
-listCommands = cmd "commands" $ do
+listCommands = cmd "commands" $ \state -> do
   success $ map fst commands
 
-jbofiheGrammar = cmd "jbofihe-grammar" $ do
+camxesGrammar = cmd "camxes-grammar" $ \state -> do
+  q <- json "q"
+  reply <- camxesQuery state q
+  success reply
+  
+camxesQuery state q = do
+  let (inp,out,_err,_pid) = stateCamxes state
+  io $ do hPutStrLn inp q
+          hFlush inp
+          hGetLine out
+
+jbofiheGrammar = cmd "jbofihe-grammar" $ \state -> do
   q <- json "q"
   t <- fromMaybe Grammar <$> maybeJson "type"
   os <- fromMaybe [] <$> maybeJson "options"
@@ -83,7 +105,6 @@ jbofihe t os q = do
         opt OmittableTerminators            = "-se"
         opt OmittableTerminatorsVerbose     = "-sev"
         opt AllowCulturalRafsi              = "-cr"
-
 
 cleanName = takeWhile (/=' ')
 nodeRest  = avoid ' ' . avoid ':' . avoid ' ' . dropWhile (/= ' ')
