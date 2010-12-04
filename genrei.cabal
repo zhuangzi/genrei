@@ -1,0 +1,23 @@
+Name:                genrei
+Version:             0.1
+Synopsis:            Lojban composer and grammar analyser.
+Homepage:            http://kiboki.net/genrei
+License:             BSD3
+License-file:        LICENSE
+Author:              Zhuangzi Nasreddin
+Maintainer:          zhuangzinasreddin@gmail.com
+Copyright:           2010 Zhuangzi Nasreddin
+Category:            Language
+Build-type:          Custom
+Cabal-version:       >=1.2
+Executable genrei.fcgi
+  Hs-source-dirs:    src
+  Main-is:           Main.hs
+  Build-depends:     base >=4 && <5,
+                     fastcgi == 3001.0.2.*,
+                     json == 0.4.*,
+                     process == 1.0.1.*,
+                     regex-compat == 0.93.*,
+                     containers == 0.3.0.*
+  Extensions:        NoMonomorphismRestriction
+  Ghc-options:       -threaded -O2 -fno-warn-missing-signatures
