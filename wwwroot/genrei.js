@@ -40,29 +40,16 @@ var Genrei = (function($){
       // Display area
       self.display = $('<div class="genrei-display"></div>');
       self.textarea.after(self.display);
-      // Update the display when necessary
-      self.textarea.change(function(){ self.updateDisplay(); });
-      self.textarea.keydown(function(){ self.updateDisplay(); });
-      setInterval(function(){
-        if (self.textarea.val() != self.currentValue) {
-          self.currentValue = self.textarea.val();
-          self.updateDisplay(self.currentValue);
-        }
-      },50);
       // Start query queuing process.
       self.startQueue();
     });
   };
 
-  Genrei.prototype.updateDisplay = function(){
-    var self = this;
-    self.queuedQuery = { text: self.currentValue };
-  };
-
   Genrei.prototype.startQueue = function(){
     var self = this;
     setInterval(function(){
-      if (!self.querying && self.queuedQuery != null) {
+      if (!self.querying && self.currentValue != self.textarea.val()) {
+        self.currentValue = self.textarea.val();
         self.queryType = self.type;
         self.querying = true;
         $.ajax({
