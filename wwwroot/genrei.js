@@ -4,6 +4,7 @@ var Genrei = (function($){
     var self = this;
     assert({ val: options.container, type: 'string', required: true });
     assert({ val: options.uri, type: 'string', required: true });
+    assert({ val: options.welcomeMessage, type: 'string' });
     self.options = options;
     // Initial values
     self.queuedQuery = null;
@@ -34,7 +35,8 @@ var Genrei = (function($){
       });
       form.append(self.chooser);
       // Input area
-      self.textarea = $('<textarea class="genrei-textarea"></textarea>');
+      self.textarea = $('<textarea spellcheck="false" class="genrei-textarea"></textarea>');
+      self.textarea.val(options.welcomeMessage);
       form.append(self.textarea);
       c.append(form);
       // Display area

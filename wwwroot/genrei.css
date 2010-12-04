@@ -3,7 +3,8 @@
 }
 
 .genrei-textarea {
-    border: 0.3em solid #ddd;
+    border: 0;
+    padding: 0;
     background: #ef;
     border-radius: 0.25em;
     -moz-border-radius: 0.25em; // Fireflabs
