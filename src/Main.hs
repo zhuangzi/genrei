@@ -79,13 +79,16 @@ jbofihe t os q = do
         opt AllowCulturalRafsi              = "-cr"
 
 
-treeToJson [Node n []] = makeObj [(realName,showJSON rest)] where
-    realName = takeWhile (/=' ') n
-    rest  = avoid ' ' . avoid ':' . avoid ' ' . dropWhile (/= ' ') $ n
-    avoid = dropWhile . (==)
+cleanName = takeWhile (/=' ')
+nodeRest  = avoid ' ' . avoid ':' . avoid ' ' . dropWhile (/= ' ')
+avoid = dropWhile . (==)
+    
+treeToJson [Node n []] = makeObj [(cleanName n,showJSON $ nodeRest n)] where
 treeToJson nodes = makeObj $ zip names objs where
-  names = map (\(Node n _) -> n) nodes
-  objs = map (\(Node _ xs) -> treeToJson xs) nodes
+  names = map (\(Node n _) -> cleanName n) nodes
+  objs = map jsonize nodes
+   where jsonize (Node n []) = showJSON $ nodeRest n
+         jsonize (Node n xs) = treeToJson xs
 
 jbofiheToTree = tree (on (==) (length . takeWhile (/='+'))) clean
               . filter (/="CHUNKS")
