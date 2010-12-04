@@ -33,7 +33,9 @@ jbofiheGrammar = cmd "jbofihe-grammar" $ do
   t <- fromMaybe Grammar <$> maybeJson "type"
   os <- fromMaybe [] <$> maybeJson "options"
   out <- jbofihe t os q
-  success $ out
+  case out of
+   Left e -> failure e
+   Right val -> success val
 
 data JbofiheType = Grammar
                  | ParseTree
@@ -59,10 +61,14 @@ instance JSON JbofiheOpt where
   readJSON = readJSONEnum "Jbofihe Opt"; showJSON = showJSONEnum
 
 jbofihe t os q = do
-  out <- io $ readProcess "jbofihe" (typ t ++ map opt os) q
-  return $ if any (==t) [ParseTreeJson,ParseTreeFullJson]
-     then treeToJson $ jbofiheToTree $ out
-     else showJSON out
+  out <- io $ catch (Right <$> readProcess "jbofihe" (typ t ++ map opt os) q)
+                    (\e -> return $ Left $ "Bad parse.")
+  case out of
+    Left e -> return $ Left e
+    Right reply -> return $ Right $ 
+      if any (==t) [ParseTreeJson,ParseTreeFullJson]
+         then treeToJson $ jbofiheToTree reply
+         else showJSON reply
   where typ ParseTree         = ["-t"]
         typ ParseTreeFull     = ["-tf"]
         typ Translate         = ["-x"]
