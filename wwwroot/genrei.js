@@ -66,7 +66,9 @@ var Genrei = (function($){
           success:function(reply){
             if (reply.success) {
               self.renderReply(reply);
+              self.textarea.removeClass('genrei-error');
             }
+            else self.textarea.addClass('genrei-error');
             self.queuedQuery = null;
             self.querying = false;
           }, 

@@ -39,6 +39,9 @@ h1, h2, h3, h4 {
     width: 100%;
     height: 15em;
 }
+.genrei-error {
+    background: #ffeeee;
+}
 .genrei-display {
     margin: 1em 0 0 0 ;
     padding: 1em;
