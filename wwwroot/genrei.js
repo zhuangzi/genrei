@@ -30,7 +30,7 @@ var Genrei = (function($){
       self.type = 'translate';
       self.chooser.change(function(){
         self.type = $(this).val();
-        self.updateDisplay();
+        self.currentValue = '';
       });
       form.append(self.chooser);
       // Input area
