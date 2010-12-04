@@ -48,7 +48,7 @@ var Genrei = (function($){
           self.currentValue = self.textarea.val();
           self.updateDisplay(self.currentValue);
         }
-      },100);
+      },50);
       // Start query queuing process.
       self.startQueue();
     });
@@ -85,7 +85,7 @@ var Genrei = (function($){
           } 
         });
       }
-    },100);
+    },50);
   };
 
   Genrei.prototype.renderReply = function(text){
