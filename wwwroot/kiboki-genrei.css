@@ -30,6 +30,9 @@ h1, h2, h3, h4 {
     margin: 0 0 1em 0;
 }
 .genrei-textarea {
+    border: 0;
+    padding: 0;
+    background: #ef;
     padding:0;
     margin:0;
     display:block;
