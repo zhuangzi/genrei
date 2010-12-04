@@ -42,7 +42,9 @@ listCommands = cmd "commands" $ \state -> do
 camxesGrammar = cmd "camxes-grammar" $ \state -> do
   q <- json "q"
   reply <- camxesQuery state q
-  success reply
+  case reply of
+    "" -> failure "Bad parse."
+    _ -> success reply
   
 camxesQuery state q = do
   let (inp,out,_err,_pid) = stateCamxes state
