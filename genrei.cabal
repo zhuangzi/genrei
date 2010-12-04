@@ -18,6 +18,7 @@ Executable genrei.fcgi
                      json == 0.4.*,
                      process == 1.0.1.*,
                      regex-compat == 0.93.*,
-                     containers == 0.3.0.*
+                     containers == 0.3.0.*,
+                     monad-loops == 0.3.1.*
   Extensions:        NoMonomorphismRestriction
   Ghc-options:       -threaded -O2 -fno-warn-missing-signatures

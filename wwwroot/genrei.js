@@ -15,8 +15,10 @@ var Genrei = (function($){
       var form = $('<form class="genrei-form"></form>');
       // Choices
       self.chooser = $('<select class="genrei-choice"></select>')
-        .append($('<option></option>').val('camxes:grammar')
+        .append($('<option></option>').val('camxes:flat')
                 .text('Outline the Grammar (camxes)'))
+        .append($('<option></option>').val('camxes:nested')
+                .text('Pretty print the Grammar (camxes)'))
         .append($('<option></option>').val('jbofihe:grammar')
                 .text("Outline the Grammar (jbofi'e)"))
         .append($('<option></option>').val('jbofihe:translate')
@@ -90,17 +92,30 @@ var Genrei = (function($){
 
   Genrei.prototype.renderReply = function(text){
     var self = this;
-    switch (self.queryType) {
-    case 'translate':
-    case 'translate-latex':
-    case 'grammar': self.display.text(text.success); break;
-    case 'translate-html': self.display.html(text.success); break;
-    case 'parse-tree-full':
-    case 'parse-tree': {
-      self.display.text(text.success);
-      self.display.html(self.display.html().replace(/\n/g,'<br>'));
-      break;
+    if (self.engine == 'jbofihe') {
+      switch (self.queryType) {
+      case 'translate':
+      case 'translate-latex':
+      case 'grammar': self.display.text(text.success); break;
+      case 'translate-html': self.display.html(text.success); break;
+      case 'parse-tree-full':
+      case 'parse-tree': {
+        self.display.text(text.success);
+        self.display.html(self.display.html().replace(/\n/g,'<br>'));
+        break;
+      }
+      }
     }
+    if (self.engine == 'camxes') {
+      switch (self.queryType) {
+      case 'flat': self.display.text(text.success); break;
+      case 'nested': {
+        self.display.text(text.success);
+        self.display.html('<pre>'+self.display.html().replace(/\n/g,'<br>')
+                         +'</pre>');
+        break;
+      }
+      }
     }
   };
   

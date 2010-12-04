@@ -10,17 +10,20 @@ import Text.JSON
 import Text.JSON.Helpers
 import Text.Printf
 import System.IO
+import Control.Monad.Loops
 
 type Camxes = (Handle,Handle,Handle,ProcessHandle)
-data State = State { stateCamxes :: Camxes }
+data State = State { stateCamxesFlat :: Camxes 
+                   , stateCamxesNested :: Camxes }
 
 main = do
-  camxes <- getCamxes ["-f"]
+  camxesFlat <- getCamxes ["-f"]
+  camxes <- getCamxes []
   runFastCGIConcurrent 20 . handleErrors $ do
     method <- fromMaybe "commands" <$> getInput "method"
     setHeader "Content-Type" "text/plain"
     case lookup method commands of
-      Just runCmd -> runCmd $ State camxes
+      Just runCmd -> runCmd $ State camxesFlat camxes
       Nothing     -> failure "Unknown page."
 
 getCamxes opts = do
@@ -39,15 +42,33 @@ cmd = (,)
 listCommands = cmd "commands" $ \state -> do
   success $ map fst commands
 
+data CamxesType = Flat | Nested
+  deriving (Show,Enum,Eq)
+  
+instance JSON CamxesType where
+  readJSON = readJSONEnum "Camxes Type"; showJSON = showJSONEnum
+
 camxesGrammar = cmd "camxes-grammar" $ \state -> do
   q <- json "q"
-  reply <- camxesQuery state q
+  t <- fromMaybe Flat <$> maybeJson "type"
+  let cmd = case t of
+              Flat -> camxesFlatQuery
+              Nested -> camxesQueryNested
+  reply <- cmd state q
   case reply of
     "" -> failure "Bad parse."
     _ -> success reply
-  
-camxesQuery state q = do
-  let (inp,out,_err,_pid) = stateCamxes state
+
+camxesQueryNested state q = do
+  let (inp,out,_err,_pid) = stateCamxesNested state
+  io $ do hPutStrLn inp q
+          hFlush inp
+          ls <- unfoldM $ do l <- hGetLine out
+                             return $ if null l then Nothing else Just l
+          return $ unlines ls
+
+camxesFlatQuery state q = do
+  let (inp,out,_err,_pid) = stateCamxesFlat state
   io $ do hPutStrLn inp q
           hFlush inp
           hGetLine out
