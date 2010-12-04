@@ -85,7 +85,7 @@ var Genrei = (function($){
           } 
         });
       }
-    },50);
+    },100);
   };
 
   Genrei.prototype.renderReply = function(text){
