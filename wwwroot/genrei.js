@@ -13,27 +13,34 @@ var Genrei = (function($){
       var c = $(this);
       // Make the form
       var form = $('<form class="genrei-form"></form>');
-      // Options
+      // Choices
       self.chooser = $('<select class="genrei-choice"></select>')
-        .append($('<option></option>').val('grammar')
-                .text('Outline the Grammar'))
-        .append($('<option></option>').val('translate')
+        .append($('<option></option>').val('camxes:grammar')
+                .text('Outline the Grammar (camxes)'))
+        .append($('<option></option>').val('jbofihe:grammar')
+                .text("Outline the Grammar (jbofi'e)"))
+        .append($('<option></option>').val('jbofihe:translate')
                 .text('Translate'))
-        .append($('<option></option>').val('translate-html')
+        .append($('<option></option>').val('jbofihe:translate-html')
                 .text('Translate (Pretty)'))
-        .append($('<option></option>').val('translate-latex')
+        .append($('<option></option>').val('jbofihe:translate-latex')
                 .text('Translate (LaTeX)'))
-        .append($('<option></option>').val('parse-tree')
+        .append($('<option></option>').val('jbofihe:parse-tree')
                 .text('Parse Tree'))
-        .append($('<option></option>').val('parse-tree-full')
+        .append($('<option></option>').val('jbofihe:parse-tree-full')
                 .text('Parse Tree (Full)'));
-      self.chooser.val('translate');
+      form.append(self.chooser);
+      // Default choices
+      self.chooser.val('camxes:translate');
+      self.engine = 'camxes';
       self.type = 'translate';
+      // Update choice
       self.chooser.change(function(){
-        self.type = $(this).val();
+        var typ = $(this).val().split(/:/);
+        self.engine = typ[0];
+        self.type = typ[1];
         self.currentValue = '';
       });
-      form.append(self.chooser);
       // Input area
       self.textarea = $('<textarea spellcheck="false" class="genrei-textarea"></textarea>');
       self.textarea.val(options.welcomeMessage);
@@ -58,7 +65,7 @@ var Genrei = (function($){
           method:'POST',
           url: '/genrei/json',
           data: {
-            method: 'jbofihe-grammar',
+            method: self.engine + '-grammar',
             type: self.type,
             q: self.textarea.val()
           },
