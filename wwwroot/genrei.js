@@ -74,8 +74,10 @@ var Genrei = (function($){
             q: self.textarea.val()
           },
           dataType: 'json',
-          success:function(text){
-            self.renderReply(text);
+          success:function(reply){
+            if (reply.success) {
+              self.renderReply(reply);
+            }
             self.queuedQuery = null;
             self.querying = false;
           }, 
