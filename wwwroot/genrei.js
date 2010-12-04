@@ -31,8 +31,8 @@ var Genrei = (function($){
                 .text('Parse Tree (Full)'));
       form.append(self.chooser);
       // Default choices
-      self.chooser.val('camxes:translate');
-      self.engine = 'camxes';
+      self.chooser.val('jbofihe:translate');
+      self.engine = 'jbofihe';
       self.type = 'translate';
       // Update choice
       self.chooser.change(function(){
