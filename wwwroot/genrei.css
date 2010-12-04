@@ -1,0 +1,10 @@
+.genrei-form {
+
+}
+
+.genrei-textarea {
+    border: 0.3em solid #ddd;
+    background: #ef;
+    border-radius: 0.25em;
+    -moz-border-radius: 0.25em; // Fireflabs
+}

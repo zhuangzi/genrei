@@ -1,0 +1,30 @@
+
+body { 
+    font-family: sans-serif; 
+}
+h1, h2, h3, h4 {
+    font-family: georgia, sans-serif;
+    color: #444;
+}
+
+
+.main-wrap {
+    margin: auto;
+    max-width: 50em;
+    padding: 1em;
+}
+
+
+.genrei-choice {
+    margin: 0 0 1em 0;
+}
+.genrei-textarea {
+    width: 100%;
+    height: 15em;
+}
+.genrei-display {
+    margin: 1em 0 0 0 ;
+    padding: 1em;
+    background: #efe;
+    font-family: monospace;
+}
