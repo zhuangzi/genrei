@@ -8,6 +8,7 @@ var Genrei = (function($){
     self.options = options;
     // Initial values
     self.queuedQuery = null;
+    self.cache = {};
     // Create the DOM and setup event handlers
     $(options.container).each(function(){
       var c = $(this);
@@ -48,6 +49,9 @@ var Genrei = (function($){
       self.textarea.val(options.welcomeMessage);
       form.append(self.textarea);
       c.append(form);
+      // Update with cached data
+      setInterval(function(){ self.updateFromCache(); },20);
+      self.textarea.change(function(){ self.updateFromCache(); });
       // Display area
       self.display = $('<div class="genrei-display"></div>');
       self.textarea.after(self.display);
@@ -56,11 +60,30 @@ var Genrei = (function($){
     });
   };
 
+  Genrei.prototype.updateFromCache = function(){
+    var self = this;
+    var val = self.textarea.val();
+    var cached = self.cache[self.engine+':'+self.type+':'+val];
+    window.cache = self.cache;
+    if (cached) {
+      self.currentValue = val;
+      if (cached.success) {
+        self.renderReply(cached);
+        self.textarea.removeClass('genrei-error');
+      }
+      else self.textarea.addClass('genrei-error');
+    } else {
+      console.log('No cache!');
+    }
+  };
+
   Genrei.prototype.startQueue = function(){
     var self = this;
     setInterval(function(){
       if (!self.querying && self.currentValue != self.textarea.val()) {
-        self.currentValue = self.textarea.val();
+        console.log('%o != %o',self.currentValue,self.textarea.val());
+        var val = self.textarea.val();
+        self.currentValue = val;
         self.queryType = self.type;
         self.querying = true;
         $.ajax({
@@ -73,6 +96,7 @@ var Genrei = (function($){
           },
           dataType: 'json',
           success:function(reply){
+            self.cache[self.engine+':'+self.type+':'+val] = reply;
             if (reply.success) {
               self.renderReply(reply);
               self.textarea.removeClass('genrei-error');
@@ -112,7 +136,7 @@ var Genrei = (function($){
       case 'nested': {
         self.display.text(text.success);
         self.display.html('<pre>'+self.display.html().replace(/\n/g,'<br>')
-                         +'</pre>');
+                          +'</pre>');
         break;
       }
       }
