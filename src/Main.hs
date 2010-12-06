@@ -11,8 +11,9 @@ import Text.JSON.Helpers
 import Text.Printf
 import System.IO
 import Control.Monad.Loops
+import Control.Concurrent
 
-type Camxes = (Handle,Handle,Handle,ProcessHandle)
+type Camxes = MVar (Handle,Handle,Handle,ProcessHandle)
 data State = State { stateCamxesFlat :: Camxes 
                    , stateCamxesNested :: Camxes }
 
@@ -30,7 +31,7 @@ getCamxes opts = do
   camxes@(inp,out,err,_) <- runInteractiveCommand $ "camxes " ++ unwords opts
   mapM_ (`hSetBinaryMode` False) [inp,out,err]
   mapM_ (const $ hGetLine out) opts
-  return camxes
+  newMVar camxes
 
 failure = outObj "failure"
 success = outObj "success"
@@ -60,18 +61,18 @@ camxesGrammar = cmd "camxes-grammar" $ \state -> do
     _ -> success reply
 
 camxesQueryNested state q = do
-  let (inp,out,_err,_pid) = stateCamxesNested state
-  io $ do hPutStrLn inp $ unwords $ words q
-          hFlush inp
-          ls <- unfoldM $ do l <- hGetLine out
-                             return $ if null l then Nothing else Just l
-          return $ unlines ls
+  io $ withMVar (stateCamxesNested state) $ \(inp,out,_err,_pid) -> do
+    hPutStrLn inp $ unwords $ words q
+    hFlush inp
+    ls <- unfoldM $ do l <- hGetLine out
+                       return $ if null l then Nothing else Just l
+    return $ unlines ls
 
 camxesFlatQuery state q = do
-  let (inp,out,_err,_pid) = stateCamxesFlat state
-  io $ do hPutStrLn inp $ unwords $ words q
-          hFlush inp
-          hGetLine out
+  io $ withMVar (stateCamxesNested state) $ \(inp,out,_err,_pid) -> do
+    hPutStrLn inp $ unwords $ words q
+    hFlush inp
+    hGetLine out
 
 jbofiheGrammar = cmd "jbofihe-grammar" $ \state -> do
   q <- json "q"
