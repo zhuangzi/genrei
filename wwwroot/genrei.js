@@ -73,7 +73,7 @@ var Genrei = (function($){
       }
       else self.textarea.addClass('genrei-error');
     } else {
-      console.log('No cache!');
+
     }
   };
 
@@ -81,7 +81,7 @@ var Genrei = (function($){
     var self = this;
     setInterval(function(){
       if (!self.querying && self.currentValue != self.textarea.val()) {
-        console.log('%o != %o',self.currentValue,self.textarea.val());
+
         var val = self.textarea.val();
         self.currentValue = val;
         self.queryType = self.type;
