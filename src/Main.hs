@@ -61,7 +61,7 @@ camxesGrammar = cmd "camxes-grammar" $ \state -> do
 
 camxesQueryNested state q = do
   let (inp,out,_err,_pid) = stateCamxesNested state
-  io $ do hPutStrLn inp q
+  io $ do hPutStrLn inp $ unwords $ words q
           hFlush inp
           ls <- unfoldM $ do l <- hGetLine out
                              return $ if null l then Nothing else Just l
