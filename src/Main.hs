@@ -69,7 +69,7 @@ camxesQueryNested state q = do
     return $ unlines ls
 
 camxesFlatQuery state q = do
-  io $ withMVar (stateCamxesNested state) $ \(inp,out,_err,_pid) -> do
+  io $ withMVar (stateCamxesFlat state) $ \(inp,out,_err,_pid) -> do
     hPutStrLn inp $ unwords $ words q
     hFlush inp
     hGetLine out
