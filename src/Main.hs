@@ -69,7 +69,7 @@ camxesQueryNested state q = do
 
 camxesFlatQuery state q = do
   let (inp,out,_err,_pid) = stateCamxesFlat state
-  io $ do hPutStrLn inp q
+  io $ do hPutStrLn inp $ unwords $ words q
           hFlush inp
           hGetLine out
 
