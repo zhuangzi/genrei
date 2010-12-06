@@ -117,7 +117,7 @@ var Genrei = (function($){
   Genrei.prototype.renderReply = function(text){
     var self = this;
     if (self.engine == 'jbofihe') {
-      switch (self.queryType) {
+      switch (self.type) {
       case 'translate':
       case 'translate-latex':
       case 'grammar': self.display.text(text.success); break;
@@ -131,7 +131,7 @@ var Genrei = (function($){
       }
     }
     if (self.engine == 'camxes') {
-      switch (self.queryType) {
+      switch (self.type) {
       case 'flat': self.display.text(text.success); break;
       case 'nested': {
         self.display.text(text.success);
