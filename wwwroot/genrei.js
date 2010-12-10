@@ -114,34 +114,43 @@ var Genrei = (function($){
     },100);
   };
 
-  Genrei.prototype.renderReply = function(text){
-    var self = this;
-    if (self.engine == 'jbofihe') {
-      switch (self.type) {
-      case 'translate':
-      case 'translate-latex':
-      case 'grammar': self.display.text(text.success); break;
-      case 'translate-html': self.display.html(text.success); break;
-      case 'parse-tree-full':
-      case 'parse-tree': {
-        self.display.text(text.success);
-        self.display.html(self.display.html().replace(/\n/g,'<br>'));
-        break;
+  Genrei.prototype.renderReply = (function(){
+    var last_text = '', last_type = '', last_engine;
+    return function(text){
+      var self = this;
+      if (text.success == last_text.success
+         && last_type == self.type
+         && last_engine == self.engine) return;
+      last_text = text;
+      last_type = self.type;
+      last_engine = self.engine;
+      if (self.engine == 'jbofihe') {
+        switch (self.type) {
+        case 'translate':
+        case 'translate-latex':
+        case 'grammar': self.display.text(text.success); break;
+        case 'translate-html': self.display.html(text.success); break;
+        case 'parse-tree-full':
+        case 'parse-tree': {
+          self.display.text(text.success);
+          self.display.html(self.display.html().replace(/\n/g,'<br>'));
+          break;
+        }
+        }
       }
+      if (self.engine == 'camxes') {
+        switch (self.type) {
+        case 'flat': self.display.text(text.success); break;
+        case 'nested': {
+          self.display.text(text.success);
+          self.display.html('<pre>'+self.display.html().replace(/\n/g,'<br>')
+                            +'</pre>');
+          break;
+        }
+        }
       }
-    }
-    if (self.engine == 'camxes') {
-      switch (self.type) {
-      case 'flat': self.display.text(text.success); break;
-      case 'nested': {
-        self.display.text(text.success);
-        self.display.html('<pre>'+self.display.html().replace(/\n/g,'<br>')
-                          +'</pre>');
-        break;
-      }
-      }
-    }
-  };
+    };
+  })();
   
   function assert(spec){
     if (!spec.required && typeof spec.val == 'undefined') return;
