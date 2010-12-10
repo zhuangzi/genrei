@@ -127,10 +127,10 @@ var Genrei = (function($){
       if (self.engine == 'jbofihe') {
         switch (self.type) {
         case 'translate':
-        case 'translate-latex':
         case 'grammar': self.display.text(text.success); break;
         case 'translate-html': self.display.html(text.success); break;
         case 'parse-tree-full':
+        case 'translate-latex':
         case 'parse-tree': {
           self.display.text(text.success);
           self.display.html(self.display.html().replace(/\n/g,'<br>'));
