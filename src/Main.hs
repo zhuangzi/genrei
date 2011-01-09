@@ -6,6 +6,7 @@ import Data.Maybe
 import Data.Tree
 import Network.FastCGI
 import System.Process
+import System.Process.Safe
 import Text.JSON
 import Text.JSON.Helpers
 import Text.Printf
@@ -107,7 +108,7 @@ instance JSON JbofiheOpt where
   readJSON = readJSONEnum "Jbofihe Opt"; showJSON = showJSONEnum
 
 jbofihe t os q = do
-  out <- io $ catch (Right <$> readProcess "jbofihe" (typ t ++ map opt os) q)
+  out <- io $ catch (Right <$> readProcessWithTimeout "jbofihe" ps q 200)
                     (\e -> return $ Left $ "Bad parse.")
   case out of
     Left e -> return $ Left e
@@ -115,7 +116,9 @@ jbofihe t os q = do
       if any (==t) [ParseTreeJson,ParseTreeFullJson]
          then treeToJson $ jbofiheToTree reply
          else showJSON reply
-  where typ ParseTree         = ["-t"]
+  where ps = (typ t ++ map opt os)
+  
+        typ ParseTree         = ["-t"]
         typ ParseTreeFull     = ["-tf"]
         typ Translate         = ["-x"]
         typ TranslateHtml     = ["-H"]
